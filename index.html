@@ -57,85 +57,687 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Crect%20width%3D'32'%20height%3D'32'%20rx%3D'6'%20fill%3D'%25236366f1'%2F%3E%3Ctext%20x%3D'16'%20y%3D'22'%20text-anchor%3D'middle'%20font-size%3D'18'%20fill%3D'white'%20font-family%3D'sans-serif'%3EN%3C%2Ftext%3E%3C%2Fsvg%3E"/>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+/* === Google Fonts (SoDoSans/Lander Tall 오픈 대체) === */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Lora:wght@500;600;700&family=Kalam:wght@400;700&display=swap');
+
+/* === Design Tokens === */
+:root {
+  /* Greens (4-tier brand system) */
+  --sb-green: #006241;
+  --sb-green-accent: #00754A;
+  --sb-green-house: #1E3932;
+  --sb-green-uplift: #2b5148;
+  --sb-green-light: #d4e9e2;
+
+  /* Gold (Rewards ceremony only) */
+  --sb-gold: #cba258;
+  --sb-gold-light: #dfc49d;
+  --sb-gold-lightest: #faf6ee;
+
+  /* Surfaces */
+  --sb-white: #ffffff;
+  --sb-neutral-cool: #f9f9f9;
+  --sb-neutral-warm: #f2f0eb;
+  --sb-ceramic: #edebe9;
+  --sb-black: #000000;
+
+  /* Text (warm — never pure black) */
+  --sb-text: rgba(0, 0, 0, 0.87);
+  --sb-text-soft: rgba(0, 0, 0, 0.58);
+  --sb-text-white: rgba(255, 255, 255, 1);
+  --sb-text-white-soft: rgba(255, 255, 255, 0.70);
+
+  /* Semantic */
+  --sb-red: #c82014;
+
+  /* Shadows (whisper-soft, layered) */
+  --sb-card-shadow: 0 0 0.5px rgba(0,0,0,0.14), 0 1px 1px rgba(0,0,0,0.24);
+  --sb-nav-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 2px 2px rgba(0,0,0,0.06), 0 0 2px rgba(0,0,0,0.07);
+  --sb-frap-shadow: 0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0.14);
+
+  /* Typography */
+  --sb-font-sans: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --sb-font-serif: 'Lora', 'Iowan Old Style', Georgia, serif;
+  --sb-font-script: 'Kalam', 'Comic Sans MS', cursive;
+  --sb-tracking: -0.01em;
+
+  /* Radius */
+  --sb-radius-card: 12px;
+  --sb-radius-pill: 50px;
+  --sb-radius-input: 4px;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1e293b; line-height: 1.6; -webkit-font-smoothing: antialiased; }
-.page-root { min-height: 100vh; background: #fff; }
+html { font-size: 62.5%; } /* 1rem = 10px (Starbucks rem trick) */
+body {
+  font-family: var(--sb-font-sans);
+  font-size: 1.6rem;
+  color: var(--sb-text);
+  line-height: 1.5;
+  letter-spacing: var(--sb-tracking);
+  -webkit-font-smoothing: antialiased;
+  background: var(--sb-neutral-warm);
+}
 
-/* Hero */
-.hero { min-height: 90vh; background: linear-gradient(135deg, #1e3a8a 0%, #6366f1 50%, #8b5cf6 100%); color: white; display: flex; align-items: center; justify-content: center; padding: 4rem 1.5rem; }
-.hero-inner { max-width: 900px; text-align: center; }
-.hero-badge { display: inline-block; padding: 0.5rem 1rem; background: rgba(255,255,255,0.18); border-radius: 999px; font-size: 0.875rem; font-weight: 500; margin-bottom: 1.5rem; backdrop-filter: blur(10px); }
-.hero-title { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
-.hero-subtitle { font-size: 1.25rem; opacity: 0.92; margin-bottom: 2.5rem; line-height: 1.6; }
-.hero-cta { display: inline-block; padding: 1rem 2.5rem; background: white; color: #6366f1; border-radius: 0.75rem; font-size: 1.125rem; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); cursor: pointer; border: none; transition: all 0.2s; }
-.hero-cta:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(0,0,0,0.25); }
+.page-root { min-height: 100vh; background: var(--sb-neutral-warm); }
 
-/* Sections */
-.section { padding: 5rem 1.5rem; }
-.section-inner { max-width: 1100px; margin: 0 auto; }
-.section-eyebrow { font-size: 0.875rem; font-weight: 600; color: #6366f1; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.75rem; text-align: center; }
-.section-title { font-size: 2.25rem; font-weight: 800; color: #1e293b; text-align: center; margin-bottom: 1rem; letter-spacing: -0.02em; }
-.section-desc { font-size: 1.125rem; color: #64748b; text-align: center; max-width: 600px; margin: 0 auto 3rem; }
+/* === Scarcity bar (心: 결핍) — House Green + Gold ceremony === */
+.scarcity-bar {
+  background: var(--sb-green-house);
+  color: var(--sb-gold);
+  padding: 1.2rem 1.6rem;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: var(--sb-tracking);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(203, 162, 88, 0.25);
+}
+.scarcity-bar .pulse {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: var(--sb-gold);
+  border-radius: 50%;
+  margin-right: 0.8rem;
+  vertical-align: middle;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
 
-/* Intro cards */
-.intro-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 3rem; }
-.intro-card { padding: 2rem; background: #f8fafc; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; }
-.intro-card:hover { border-color: #6366f1; transform: translateY(-4px); box-shadow: 0 10px 30px rgba(99,102,241,0.1); }
-.intro-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-.intro-card-title { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-bottom: 0.5rem; }
-.intro-card-desc { font-size: 0.95rem; color: #64748b; line-height: 1.6; }
+/* === Hero === Cream canvas — 따뜻한 시작 */
+.hero {
+  min-height: 88vh;
+  background: var(--sb-neutral-warm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6.4rem 1.6rem;
+}
+.hero-inner { max-width: 88rem; text-align: center; }
+.hero-badge {
+  display: inline-block;
+  padding: 0.6rem 1.4rem;
+  background: var(--sb-white);
+  color: var(--sb-green-accent);
+  border: 1px solid var(--sb-green-light);
+  border-radius: var(--sb-radius-pill);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 2.4rem;
+  letter-spacing: var(--sb-tracking);
+}
+.hero-title {
+  font-family: var(--sb-font-serif);
+  font-size: 5rem;
+  font-weight: 600;
+  line-height: 1.15;
+  margin-bottom: 2.4rem;
+  letter-spacing: -0.16px;
+  color: var(--sb-green);
+}
+.hero-subtitle {
+  font-size: 1.9rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--sb-text);
+  margin-bottom: 3.2rem;
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.hero-cta {
+  display: inline-block;
+  padding: 1.4rem 3.2rem;
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+  border: 1px solid var(--sb-green-accent);
+  border-radius: var(--sb-radius-pill);
+  font-family: var(--sb-font-sans);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: var(--sb-tracking);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.hero-cta:hover { background: var(--sb-green); border-color: var(--sb-green); }
+.hero-cta:active { transform: scale(0.95); }
 
-/* Reviews */
-.reviews-bg { background: #f8fafc; }
-.reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-.review-card { padding: 1.75rem; background: white; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-.review-stars { color: #fbbf24; font-size: 1.125rem; margin-bottom: 0.75rem; letter-spacing: 0.1em; }
-.review-text { color: #334155; line-height: 1.7; margin-bottom: 1.25rem; font-size: 0.95rem; }
-.review-meta { display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid #f1f5f9; }
-.review-author { font-weight: 600; color: #1e293b; font-size: 0.95rem; }
-.review-clinic { font-size: 0.8rem; color: #94a3b8; margin-top: 0.125rem; }
-.review-date { font-size: 0.8rem; color: #94a3b8; }
-.pager { display: flex; justify-content: center; gap: 0.5rem; margin-top: 2.5rem; flex-wrap: wrap; }
-.pager button { padding: 0.5rem 0.875rem; border: 1px solid #e2e8f0; border-radius: 0.5rem; background: white; color: #475569; font-size: 0.875rem; cursor: pointer; transition: all 0.2s; min-width: 2.5rem; }
-.pager button:hover:not(:disabled) { background: #6366f1; color: white; border-color: #6366f1; }
-.pager button.active { background: #6366f1; color: white; border-color: #6366f1; }
+/* === Trust bar (心: 사회적 증거 + 밴드웨건) === White card on cream */
+.trust-bar {
+  background: var(--sb-white);
+  border-radius: var(--sb-radius-card);
+  padding: 2.4rem;
+  margin-top: 4rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.6rem;
+  box-shadow: var(--sb-card-shadow);
+}
+.trust-stat { text-align: center; }
+.trust-stat-num {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: var(--sb-green);
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.16px;
+}
+.trust-stat-label {
+  font-size: 1.3rem;
+  color: var(--sb-text-soft);
+}
+
+/* === Sections === */
+.section { padding: 8rem 1.6rem; }
+.section-inner { max-width: 110rem; margin: 0 auto; }
+.section-eyebrow {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--sb-green-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.section-title {
+  font-size: 3.6rem;
+  font-weight: 600;
+  color: var(--sb-text);
+  text-align: center;
+  margin-bottom: 1.6rem;
+  letter-spacing: -0.16px;
+  line-height: 1.2;
+}
+.section-desc {
+  font-size: 1.6rem;
+  color: var(--sb-text-soft);
+  text-align: center;
+  max-width: 60rem;
+  margin: 0 auto 4.8rem;
+  line-height: 1.6;
+}
+
+/* === Authority (心: 권위 편향) === White content section */
+.authority { background: var(--sb-white); padding: 6.4rem 1.6rem; }
+.author-card {
+  max-width: 80rem;
+  margin: 3.2rem auto 0;
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+  gap: 3.2rem;
+  align-items: center;
+  padding: 3.2rem;
+  background: var(--sb-neutral-warm);
+  border-radius: var(--sb-radius-card);
+  box-shadow: var(--sb-card-shadow);
+}
+.author-photo {
+  width: 16rem; height: 16rem;
+  border-radius: 50%;
+  background: var(--sb-green-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5.6rem;
+  color: var(--sb-white);
+}
+.author-name {
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--sb-green);
+  margin-bottom: 0.4rem;
+  letter-spacing: -0.16px;
+}
+.author-title {
+  font-size: 1.5rem;
+  color: var(--sb-green-accent);
+  font-weight: 600;
+  margin-bottom: 1.6rem;
+}
+.author-creds { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+.author-cred {
+  padding: 0.5rem 1rem;
+  background: var(--sb-white);
+  border: 1px solid var(--sb-ceramic);
+  border-radius: var(--sb-radius-pill);
+  font-size: 1.3rem;
+  color: var(--sb-text);
+}
+
+/* === Intro cards === Cream canvas — White cards */
+.intro-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+  gap: 2.4rem;
+  margin-top: 4rem;
+}
+.intro-card {
+  padding: 3.2rem 2.4rem;
+  background: var(--sb-white);
+  border-radius: var(--sb-radius-card);
+  box-shadow: var(--sb-card-shadow);
+  transition: transform 0.2s ease;
+}
+.intro-card:hover { transform: translateY(-4px); }
+.intro-icon { font-size: 4rem; margin-bottom: 1.6rem; }
+.intro-card-title {
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--sb-green);
+  margin-bottom: 0.8rem;
+  letter-spacing: -0.16px;
+}
+.intro-card-desc {
+  font-size: 1.5rem;
+  color: var(--sb-text);
+  line-height: 1.6;
+}
+.intro-card.featured {
+  background: var(--sb-green-house);
+  position: relative;
+}
+.intro-card.featured .intro-card-title { color: var(--sb-white); }
+.intro-card.featured .intro-card-desc { color: var(--sb-text-white-soft); }
+.intro-card.featured::before {
+  content: '인기';
+  position: absolute;
+  top: -1.2rem;
+  right: 1.6rem;
+  background: var(--sb-gold);
+  color: var(--sb-white);
+  padding: 0.4rem 1rem;
+  border-radius: var(--sb-radius-pill);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: var(--sb-tracking);
+}
+
+/* === Cost comparison (心: 손실 회피 + 미끼) === House Green Feature Band */
+.cost-section {
+  background: var(--sb-green-house);
+  color: var(--sb-text-white);
+}
+.cost-section .section-eyebrow { color: var(--sb-gold); }
+.cost-section .section-title { color: var(--sb-text-white); }
+.cost-section .section-desc { color: var(--sb-text-white-soft); }
+.cost-table {
+  max-width: 72rem;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--sb-radius-card);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.cost-row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  padding: 2rem 2.4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  align-items: center;
+}
+.cost-row:last-child { border-bottom: none; }
+.cost-row.header {
+  background: rgba(0,0,0,0.2);
+  font-weight: 700;
+  font-size: 1.3rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--sb-gold);
+}
+.cost-row.highlight { background: rgba(203, 162, 88, 0.1); }
+.cost-label { color: var(--sb-text-white); font-size: 1.5rem; }
+.cost-amount { font-size: 1.6rem; text-align: right; }
+.cost-amount-mute { color: var(--sb-text-white-soft); }
+.cost-amount-after { color: var(--sb-green-light); font-weight: 700; }
+.cost-amount-loss { color: #ff8a80; font-weight: 600; }
+.cost-note {
+  text-align: center;
+  margin-top: 2.4rem;
+  color: var(--sb-gold);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+/* === Reviews === Ceramic surface — White cards */
+.reviews-bg { background: var(--sb-ceramic); }
+.reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(28rem, 1fr));
+  gap: 2.4rem;
+}
+.review-card {
+  padding: 2.8rem;
+  background: var(--sb-white);
+  border-radius: var(--sb-radius-card);
+  box-shadow: var(--sb-card-shadow);
+}
+.review-stars {
+  color: var(--sb-gold);
+  font-size: 1.6rem;
+  margin-bottom: 1.2rem;
+  letter-spacing: 0.1em;
+}
+.review-text {
+  color: var(--sb-text);
+  line-height: 1.7;
+  margin-bottom: 1.6rem;
+  font-size: 1.5rem;
+}
+.review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.6rem;
+  border-top: 1px solid var(--sb-ceramic);
+}
+.review-author { font-weight: 600; color: var(--sb-green); font-size: 1.5rem; }
+.review-clinic { font-size: 1.3rem; color: var(--sb-text-soft); margin-top: 0.2rem; }
+.review-date { font-size: 1.3rem; color: var(--sb-text-soft); }
+
+.pager {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 4rem;
+  flex-wrap: wrap;
+}
+.pager button {
+  padding: 0.8rem 1.4rem;
+  border: 1px solid var(--sb-green-accent);
+  border-radius: var(--sb-radius-pill);
+  background: var(--sb-white);
+  color: var(--sb-green-accent);
+  font-size: 1.4rem;
+  font-weight: 600;
+  font-family: var(--sb-font-sans);
+  letter-spacing: var(--sb-tracking);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 4rem;
+}
+.pager button:hover:not(:disabled) {
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+}
+.pager button:active { transform: scale(0.95); }
+.pager button.active {
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+}
 .pager button:disabled { opacity: 0.4; cursor: not-allowed; }
-.state-msg { text-align: center; padding: 3rem; color: #64748b; }
 
-/* Form */
-.form-bg { background: linear-gradient(180deg, #fff 0%, #f8fafc 100%); }
-.form-card { max-width: 640px; margin: 0 auto; padding: 2.5rem; background: white; border-radius: 1.5rem; border: 1px solid #e2e8f0; box-shadow: 0 20px 50px rgba(0,0,0,0.06); }
-.form-row { margin-bottom: 1.25rem; }
-.form-row-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.form-label { display: block; font-size: 0.875rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem; }
-.form-input, .form-textarea { width: 100%; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 1rem; font-family: inherit; transition: all 0.2s; background: white; }
-.form-input:focus, .form-textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
-.form-textarea { min-height: 120px; resize: vertical; }
-.form-radio-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-.form-radio { padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; cursor: pointer; text-align: center; font-size: 0.95rem; transition: all 0.2s; user-select: none; }
-.form-radio.selected { background: #6366f1; color: white; border-color: #6366f1; }
+/* === Form === Cream canvas — White card */
+.form-bg { background: var(--sb-neutral-warm); }
+.form-card {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 4rem;
+  background: var(--sb-white);
+  border-radius: var(--sb-radius-card);
+  box-shadow: var(--sb-card-shadow);
+}
+.form-row { margin-bottom: 2rem; }
+.form-row-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.6rem;
+}
+.form-label {
+  display: block;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--sb-text);
+  margin-bottom: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid #d6dbde;
+  border-radius: var(--sb-radius-input);
+  font-size: 1.6rem;
+  font-family: var(--sb-font-sans);
+  letter-spacing: var(--sb-tracking);
+  background: var(--sb-white);
+  color: var(--sb-text);
+  transition: all 0.2s ease;
+}
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--sb-green-accent);
+  box-shadow: 0 0 0 2px rgba(0, 117, 74, 0.15);
+}
+.form-textarea { min-height: 12rem; resize: vertical; }
+.form-radio-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+.form-radio {
+  padding: 1.2rem 1.4rem;
+  border: 1px solid #d6dbde;
+  border-radius: var(--sb-radius-pill);
+  cursor: pointer;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--sb-text);
+  transition: all 0.2s ease;
+  user-select: none;
+  background: var(--sb-white);
+}
+.form-radio.selected {
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+  border-color: var(--sb-green-accent);
+}
 .form-radio input { display: none; }
-.form-consent { display: flex; align-items: flex-start; gap: 0.625rem; margin: 1.5rem 0; font-size: 0.875rem; color: #475569; cursor: pointer; }
-.form-consent input { margin-top: 0.2rem; cursor: pointer; }
-.form-error { color: #dc2626; font-size: 0.8125rem; margin-top: 0.375rem; }
-.form-submit { width: 100%; padding: 1rem; background: #6366f1; color: white; border: none; border-radius: 0.75rem; font-size: 1.0625rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-.form-submit:hover:not(:disabled) { background: #4f46e5; transform: translateY(-1px); box-shadow: 0 10px 25px rgba(99,102,241,0.3); }
+.form-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin: 2rem 0;
+  font-size: 1.4rem;
+  color: var(--sb-text-soft);
+  cursor: pointer;
+}
+.form-consent input { margin-top: 0.3rem; cursor: pointer; }
+.form-error {
+  color: var(--sb-red);
+  font-size: 1.3rem;
+  margin-top: 0.6rem;
+}
+.form-submit {
+  width: 100%;
+  padding: 1.4rem;
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+  border: 1px solid var(--sb-green-accent);
+  border-radius: var(--sb-radius-pill);
+  font-family: var(--sb-font-sans);
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: var(--sb-tracking);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.form-submit:hover:not(:disabled) {
+  background: var(--sb-green);
+  border-color: var(--sb-green);
+}
+.form-submit:active { transform: scale(0.95); }
 .form-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-.form-success { padding: 2rem; background: #f0fdf4; border: 1px solid #86efac; border-radius: 1rem; text-align: center; color: #166534; }
-.form-success-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+.form-success {
+  padding: 3.2rem;
+  background: rgba(212, 233, 226, 0.33);
+  border: 1px solid var(--sb-green-light);
+  border-radius: var(--sb-radius-card);
+  text-align: center;
+  color: var(--sb-green);
+}
+.form-success-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  color: var(--sb-green);
+  letter-spacing: -0.16px;
+}
 
-/* Footer */
-.footer { background: #0f172a; color: #94a3b8; padding: 2rem 1.5rem; text-align: center; font-size: 0.875rem; }
+/* === Gift banner (心: 호혜성) === Gold Lightest */
+.gift-banner {
+  max-width: 64rem;
+  margin: 0 auto 2rem;
+  padding: 1.6rem 2rem;
+  background: var(--sb-gold-lightest);
+  border: 1px dashed var(--sb-gold);
+  border-radius: var(--sb-radius-card);
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+.gift-icon { font-size: 2.4rem; flex-shrink: 0; }
+.gift-text { color: var(--sb-text); font-size: 1.4rem; line-height: 1.5; }
+.gift-text strong { color: var(--sb-gold); font-weight: 700; }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .hero-title { font-size: 2rem; }
-  .hero-subtitle { font-size: 1rem; }
-  .section { padding: 3.5rem 1.25rem; }
-  .section-title { font-size: 1.75rem; }
-  .form-card { padding: 1.5rem; }
+/* === Form progress (心: 제이가르닉) === */
+.form-progress { margin-bottom: 2.4rem; }
+.form-progress-bar {
+  height: 6px;
+  background: var(--sb-ceramic);
+  border-radius: var(--sb-radius-pill);
+  overflow: hidden;
+}
+.form-progress-fill {
+  height: 100%;
+  background: var(--sb-green-accent);
+  border-radius: var(--sb-radius-pill);
+  transition: width 0.4s ease;
+}
+.form-progress-text {
+  font-size: 1.3rem;
+  color: var(--sb-text-soft);
+  margin-top: 0.6rem;
+  text-align: right;
+  font-weight: 600;
+}
+
+/* === Step status (心: 노력 인식) === */
+.form-step-status {
+  padding: 1.4rem 1.6rem;
+  background: rgba(212, 233, 226, 0.5);
+  border: 1px solid var(--sb-green-light);
+  border-radius: var(--sb-radius-card);
+  text-align: center;
+  color: var(--sb-green);
+  font-size: 1.4rem;
+  font-weight: 500;
+  margin-bottom: 1.6rem;
+}
+.form-step-spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--sb-green-light);
+  border-top-color: var(--sb-green-accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.8rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === Peak-end actions (心: 피크엔드) === */
+.peak-end-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.peak-end-btn {
+  padding: 1.2rem 1.8rem;
+  border-radius: var(--sb-radius-pill);
+  font-family: var(--sb-font-sans);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: var(--sb-tracking);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+.peak-end-btn.primary {
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+}
+.peak-end-btn.primary:hover { background: var(--sb-green); }
+.peak-end-btn.secondary {
+  background: var(--sb-white);
+  color: var(--sb-green-accent);
+  border: 1.5px solid var(--sb-green-accent);
+}
+.peak-end-btn.secondary:hover { background: var(--sb-neutral-warm); }
+.peak-end-btn:active { transform: scale(0.95); }
+
+/* === Frap Floating CTA — Starbucks signature elevation === */
+.frap-cta {
+  position: fixed;
+  bottom: 2.4rem;
+  right: 2.4rem;
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 50%;
+  background: var(--sb-green-accent);
+  color: var(--sb-white);
+  border: none;
+  font-size: 2.4rem;
+  cursor: pointer;
+  box-shadow: var(--sb-frap-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 40;
+  transition: all 0.2s ease;
+}
+.frap-cta:hover { background: var(--sb-green); }
+.frap-cta:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 6px rgba(0,0,0,0.24), 0 8px 12px rgba(0,0,0,0);
+}
+
+/* === Footer === House Green espresso bookend */
+.footer {
+  background: var(--sb-green-house);
+  color: var(--sb-text-white-soft);
+  padding: 3.2rem 1.6rem;
+  text-align: center;
+  font-size: 1.4rem;
+  letter-spacing: var(--sb-tracking);
+}
+.footer strong { color: var(--sb-gold); font-weight: 700; }
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .hero { min-height: auto; padding: 4.8rem 1.6rem; }
+  .hero-title { font-size: 3.2rem; }
+  .hero-subtitle { font-size: 1.6rem; }
+  .section { padding: 5.6rem 1.6rem; }
+  .section-title { font-size: 2.4rem; }
+  .form-card { padding: 2.4rem; }
   .form-row-grid { grid-template-columns: 1fr; }
   .form-radio-group { grid-template-columns: 1fr; }
+  .trust-bar { grid-template-columns: 1fr; gap: 1.2rem; }
+  .trust-stat-num { font-size: 2.4rem; }
+  .author-card { grid-template-columns: 1fr; text-align: center; padding: 2.4rem; }
+  .author-photo { margin: 0 auto; width: 12rem; height: 12rem; font-size: 4rem; }
+  .author-creds { justify-content: center; }
+  .cost-row { grid-template-columns: 1fr; gap: 0.8rem; text-align: left; padding: 1.6rem 2rem; }
+  .cost-row.header { display: none; }
+  .cost-amount { text-align: left; }
+  .frap-cta { bottom: 1.6rem; right: 1.6rem; width: 4.8rem; height: 4.8rem; font-size: 2rem; }
 }
 </style>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -144,7 +746,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; c
 var __stripPlugin=function(){return{visitor:{ImportDeclaration:function(path){var src=path.node.source.value;if(src.indexOf("./")===0||src.indexOf("../")===0)path.remove();},ExportDefaultDeclaration:function(path){var decl=path.node.declaration;if(decl.type==="FunctionDeclaration"||decl.type==="ClassDeclaration"){path.replaceWith(decl);}else{path.replaceWith({type:"VariableDeclaration",kind:"var",declarations:[{type:"VariableDeclarator",id:{type:"Identifier",name:"_default"},init:decl}]});}},ExportNamedDeclaration:function(path){if(path.node.declaration){path.replaceWith(path.node.declaration);}else{path.remove();}},ExportAllDeclaration:function(path){path.remove();}}};};
 var __dedupePlugin=function(){var _s={};return{visitor:{VariableDeclaration:function(p){if(p.parent.type!=="Program")return;if(p.node.kind!=="const"&&p.node.kind!=="let")return;var kept=[];for(var i=0;i<p.node.declarations.length;i++){var d=p.node.declarations[i];var n=d.id&&d.id.type==="Identifier"?d.id.name:null;if(n&&_s[n]){}else{if(n)_s[n]=true;kept.push(d);}}if(kept.length===0){p.remove();}else{p.node.declarations=kept;}}}}};
 var __jsxDecodePlugin=function(){function _d(v){v=v.replace(/\\u\{([0-9a-fA-F]+)\}/g,function(_,h){return String.fromCodePoint(parseInt(h,16));});v=v.replace(/\\u([0-9a-fA-F]{4})/g,function(_,h){return String.fromCharCode(parseInt(h,16));});return v;}return{visitor:{JSXText:function(p){p.node.value=_d(p.node.value);},StringLiteral:function(p){if(!p.parent||p.parent.type!=="JSXAttribute")return;p.node.value=_d(p.node.value);}}}};
-var __code="import React from 'https://esm.sh/react';\nimport ReactDOM from 'https://esm.sh/react-dom/client';\nimport { useState, useEffect, useMemo } from 'https://esm.sh/react';\n\n// === 설정: 실제 DB ID로 교체 ===\nconst REVIEWS_DB_ID = '여기에_REVIEWS_DB_ID_입력';\nconst INQUIRIES_DB_ID = '여기에_INQUIRIES_DB_ID_입력';\nconst ITEMS_PER_PAGE = 6;\n\n// === DB ID 추출 헬퍼 ===\nfunction extractDbId(raw) {\n  if (!raw) return raw;\n  const s = raw.replace(/-/g, '');\n  const m = s.match(/([a-f0-9]{32})/);\n  return m ? m[1] : raw;\n}\n\n// === 속성값 파싱 ===\nfunction getValue(prop) {\n  if (!prop) return '';\n  switch (prop.type) {\n    case 'title':     return prop.title.map(t => t.plain_text).join('');\n    case 'rich_text': return prop.rich_text.map(t => t.plain_text).join('');\n    case 'number':    return prop.number ?? 0;\n    case 'date':      return prop.date?.start ?? '';\n    case 'select':    return prop.select?.name ?? '';\n    default:          return '';\n  }\n}\n\n// === Fallback 후기 데이터 (DB 연결 전/실패 시 표시) ===\nconst FALLBACK_REVIEWS = [\n  { id: 'fb1', name: '김OO', clinic: '서울덴탈치과', stars: 5, text: '재고 관리가 단순해졌습니다. 임플란트 픽스처를 종류별로 정리하니 폐기율이 절반으로 줄었어요.', date: '2026-04-10' },\n  { id: 'fb2', name: '이OO', clinic: '미소드림치과', stars: 5, text: '수술기록지에서 자동으로 재고가 차감되는 게 정말 편합니다. 직원 교육 시간도 줄었어요.', date: '2026-04-05' },\n  { id: 'fb3', name: '박OO', clinic: '연세이플란트치과', stars: 4, text: '강의 후 바로 실무 적용 가능한 수준이라 만족했습니다. 추가 컨설팅도 신청 예정.', date: '2026-03-28' },\n  { id: 'fb4', name: '정OO', clinic: '하나치과의원', stars: 5, text: '월말 재고 정산이 5분이면 끝납니다. 노션과 연동되는 점이 결정적이었습니다.', date: '2026-03-20' },\n  { id: 'fb5', name: '최OO', clinic: '예다움치과', stars: 5, text: '실수술 데이터 기반으로 다음 달 발주량을 예측해주는 기능이 인상적입니다.', date: '2026-03-15' },\n  { id: 'fb6', name: '강OO', clinic: '바른이치과', stars: 4, text: '도입 후 임플란트 분실/오발주 0건. 강의도 친절하시고 사후 지원도 좋습니다.', date: '2026-03-08' },\n];\n\n// === Hero ===\nfunction Hero({ onCtaClick }) {\n  return (\n    <section id=\"hero\" className=\"hero\">\n      <div className=\"hero-inner\">\n        <div className=\"hero-badge\">🦷 치과 원장님을 위한 실무 강의</div>\n        <h1 className=\"hero-title\">수술기록지가<br/>재고 장부가 됩니다</h1>\n        <p className=\"hero-subtitle\">\n          임플란트 재고관리, 더 이상 엑셀로 고생하지 마세요.<br/>\n          노션 기반 자동화 시스템으로 5분 만에 월말 정산이 끝나며 폐기율도 절반이하로 낮습니다.\n        </p>\n        <button className=\"hero-cta\" onClick={onCtaClick}>지금 신청하기 →</button>\n      </div>\n    </section>\n  );\n}\n\n// === Intro ===\nfunction Intro() {\n  const cards = [\n    { icon: '⚡', title: '5분 정산', desc: '월말 재고 정산이 5분이면 끝. 수술기록지에서 자동 차감됩니다.' },\n    { icon: '📊', title: '폐기율 절반', desc: '유효기간·로트번호 관리로 폐기되는 임플란트를 절반 이하로.' },\n    { icon: '🔮', title: '발주량 예측', desc: '실수술 데이터 기반으로 다음 달 발주량을 자동 추천합니다.' },\n    { icon: '📱', title: '모바일 완벽', desc: '노션 앱으로 어디서든 재고 확인. 직원도 1시간이면 적응합니다.' },\n  ];\n  return (\n    <section id=\"intro\" className=\"section\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">강의 핵심</p>\n        <h2 className=\"section-title\">왜 1,200명의 원장님이 선택했을까요?</h2>\n        <p className=\"section-desc\">3시간 강의로 임플란트 재고관리의 모든 것을 끝냅니다.</p>\n        <div className=\"intro-grid\">\n          {cards.map((c, i) => (\n            <div key={c.title} className=\"intro-card\">\n              <div className=\"intro-icon\">{c.icon}</div>\n              <h3 className=\"intro-card-title\">{c.title}</h3>\n              <p className=\"intro-card-desc\">{c.desc}</p>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n\n// === Reviews (Notion DB 연동) ===\nfunction Reviews() {\n  const [items, setItems] = useState(FALLBACK_REVIEWS);\n  const [loading, setLoading] = useState(true);\n  const [page, setPage] = useState(1);\n\n  useEffect(() => {\n    const dbId = extractDbId(REVIEWS_DB_ID);\n    fetch(`/api/notion/databases/${dbId}/query`, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ page_size: 100 }),\n    })\n      .then(r => r.json())\n      .then(data => {\n        if (data.results?.length) {\n          const parsed = data.results.map(p => ({\n            id: p.id,\n            name: getValue(p.properties['원장님명']) || '익명',\n            clinic: getValue(p.properties['치과명']) || '',\n            stars: getValue(p.properties['별점']) || 5,\n            text: getValue(p.properties['후기내용']) || '',\n            date: getValue(p.properties['날짜']) || '',\n          }));\n          setItems(parsed);\n        }\n      })\n      .catch(err => console.error('Reviews fetch failed:', err))\n      .finally(() => setLoading(false));\n  }, []);\n\n  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);\n  const pageData = useMemo(\n    () => items.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),\n    [items, page]\n  );\n\n  return (\n    <section id=\"reviews\" className=\"section reviews-bg\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">수강 후기</p>\n        <h2 className=\"section-title\">먼저 시작하신 원장님들의 이야기</h2>\n        <p className=\"section-desc\">{loading ? '불러오는 중...' : `총 ${items.length}개의 후기`}</p>\n        <div className=\"reviews-grid\">\n          {pageData.map(r => (\n            <div key={r.id} className=\"review-card\">\n              <div className=\"review-stars\">{'⭐'.repeat(r.stars)}</div>\n              <p className=\"review-text\">{r.text}</p>\n              <div className=\"review-meta\">\n                <div>\n                  <div className=\"review-author\">{r.name}</div>\n                  <div className=\"review-clinic\">{r.clinic}</div>\n                </div>\n                <div className=\"review-date\">{r.date}</div>\n              </div>\n            </div>\n          ))}\n        </div>\n        {totalPages > 1 && (\n          <div className=\"pager\">\n            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>이전</button>\n            {Array.from({ length: totalPages }, (_, i) => (\n              <button key={i + 1} className={page === i + 1 ? 'active' : ''} onClick={() => setPage(i + 1)}>\n                {i + 1}\n              </button>\n            ))}\n            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>다음</button>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n\n// === Apply Form (POST to Inquiries DB) ===\nfunction ApplyForm() {\n  const [form, setForm] = useState({\n    name: '', clinic: '', phone: '', email: '', interest: '강의', message: '', consent: false,\n  });\n  const [errors, setErrors] = useState({});\n  const [status, setStatus] = useState('idle');\n\n  const handleChange = (key) => (e) => {\n    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;\n    setForm(f => ({ ...f, [key]: value }));\n  };\n\n  const validate = () => {\n    const errs = {};\n    if (form.name.trim().length < 2) errs.name = '원장님명을 2자 이상 입력해주세요';\n    if (!form.clinic.trim()) errs.clinic = '치과명을 입력해주세요';\n    if (!/^01[0-9]-?\\d{3,4}-?\\d{4}$/.test(form.phone)) errs.phone = '연락처 형식이 올바르지 않습니다';\n    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(form.email)) errs.email = '이메일 형식이 올바르지 않습니다';\n    if (form.message.trim().length < 10) errs.message = '문의내용을 10자 이상 입력해주세요';\n    if (!form.consent) errs.consent = '개인정보 수집·이용에 동의해주세요';\n    return errs;\n  };\n\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    const errs = validate();\n    setErrors(errs);\n    if (Object.keys(errs).length > 0) return;\n\n    setStatus('submitting');\n    const dbId = extractDbId(INQUIRIES_DB_ID);\n\n    fetch('/api/notion/pages', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        parent: { database_id: dbId },\n        properties: {\n          '원장님명': { title: [{ text: { content: form.name } }] },\n          '치과명':   { rich_text: [{ text: { content: form.clinic } }] },\n          '연락처':   { phone_number: form.phone },\n          '이메일':   { email: form.email },\n          '관심분야': { select: { name: form.interest } },\n          '문의내용': { rich_text: [{ text: { content: form.message } }] },\n        },\n      }),\n    })\n      .then(r => r.json())\n      .then(() => setStatus('success'))\n      .catch(err => {\n        console.error('Submit failed:', err);\n        setStatus('success');\n      });\n  };\n\n  if (status === 'success') {\n    return (\n      <section id=\"apply\" className=\"section form-bg\">\n        <div className=\"section-inner\">\n          <div className=\"form-card\">\n            <div className=\"form-success\">\n              <div className=\"form-success-title\">✅ 접수되었습니다</div>\n              <p>1영업일 이내에 입력하신 연락처로 답변 드리겠습니다.</p>\n            </div>\n          </div>\n        </div>\n      </section>\n    );\n  }\n\n  return (\n    <section id=\"apply\" className=\"section form-bg\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">신청 · 문의</p>\n        <h2 className=\"section-title\">3시간 강의, 지금 신청하세요</h2>\n        <p className=\"section-desc\">접수 후 1영업일 이내에 안내 드립니다.</p>\n        <form className=\"form-card\" onSubmit={handleSubmit} noValidate>\n          <div className=\"form-row-grid\">\n            <div className=\"form-row\">\n              <label className=\"form-label\">원장님명 *</label>\n              <input className=\"form-input\" type=\"text\" value={form.name} onChange={handleChange('name')} placeholder=\"홍길동\" />\n              {errors.name && <div className=\"form-error\">{errors.name}</div>}\n            </div>\n            <div className=\"form-row\">\n              <label className=\"form-label\">치과명 *</label>\n              <input className=\"form-input\" type=\"text\" value={form.clinic} onChange={handleChange('clinic')} placeholder=\"○○치과\" />\n              {errors.clinic && <div className=\"form-error\">{errors.clinic}</div>}\n            </div>\n          </div>\n          <div className=\"form-row-grid\">\n            <div className=\"form-row\">\n              <label className=\"form-label\">연락처 *</label>\n              <input className=\"form-input\" type=\"tel\" value={form.phone} onChange={handleChange('phone')} placeholder=\"010-0000-0000\" />\n              {errors.phone && <div className=\"form-error\">{errors.phone}</div>}\n            </div>\n            <div className=\"form-row\">\n              <label className=\"form-label\">이메일 *</label>\n              <input className=\"form-input\" type=\"email\" value={form.email} onChange={handleChange('email')} placeholder=\"doctor@clinic.com\" />\n              {errors.email && <div className=\"form-error\">{errors.email}</div>}\n            </div>\n          </div>\n          <div className=\"form-row\">\n            <label className=\"form-label\">관심분야 *</label>\n            <div className=\"form-radio-group\">\n              {['강의', '상담', '도입'].map(opt => (\n                <label key={opt} className={`form-radio ${form.interest === opt ? 'selected' : ''}`}>\n                  <input type=\"radio\" name=\"interest\" value={opt} checked={form.interest === opt} onChange={handleChange('interest')} />\n                  {opt}\n                </label>\n              ))}\n            </div>\n          </div>\n          <div className=\"form-row\">\n            <label className=\"form-label\">문의내용 *</label>\n            <textarea className=\"form-textarea\" value={form.message} onChange={handleChange('message')} placeholder=\"궁금하신 점이나 도입 검토 중인 상황을 알려주세요\" />\n            {errors.message && <div className=\"form-error\">{errors.message}</div>}\n          </div>\n          <label className=\"form-consent\">\n            <input type=\"checkbox\" checked={form.consent} onChange={handleChange('consent')} />\n            <span>개인정보 수집·이용에 동의합니다 (수집항목: 이름, 치과명, 연락처, 이메일 / 보유기간: 문의 처리 후 1년)</span>\n          </label>\n          {errors.consent && <div className=\"form-error\">{errors.consent}</div>}\n          <button type=\"submit\" className=\"form-submit\" disabled={status === 'submitting'}>\n            {status === 'submitting' ? '제출 중...' : '신청 제출하기'}\n          </button>\n        </form>\n      </div>\n    </section>\n  );\n}\n\n// === Main App ===\nfunction App() {\n  const handleCtaClick = () => {\n    document.getElementById('apply')?.scrollIntoView({ behavior: 'smooth' });\n  };\n\n  return (\n    <main className=\"page-root\">\n      <Hero onCtaClick={handleCtaClick} />\n      <Intro />\n      <Reviews />\n      <ApplyForm />\n      <footer className=\"footer\">© 2026 임플란트 재고관리 강의. All rights reserved.</footer>\n    </main>\n  );\n}\n\nReactDOM.createRoot(document.getElementById('root')).render(<App />);";
+var __code="import React from 'https://esm.sh/react';\nimport ReactDOM from 'https://esm.sh/react-dom/client';\nimport { useState, useEffect, useMemo } from 'https://esm.sh/react';\n\n// === 설정: 실제 DB ID로 교체 ===\nconst REVIEWS_DB_ID = '여기에_REVIEWS_DB_ID_입력';\nconst INQUIRIES_DB_ID = '여기에_INQUIRIES_DB_ID_입력';\nconst ITEMS_PER_PAGE = 6;\nconst SEATS_REMAINING = 3; // [心: 결핍] 운영자가 수동 갱신\n\n// === DB ID 추출 헬퍼 ===\nfunction extractDbId(raw) {\n  if (!raw) return raw;\n  const s = raw.replace(/-/g, '');\n  const m = s.match(/([a-f0-9]{32})/);\n  return m ? m[1] : raw;\n}\n\n// === 속성값 파싱 ===\nfunction getValue(prop) {\n  if (!prop) return '';\n  switch (prop.type) {\n    case 'title':     return prop.title.map(t => t.plain_text).join('');\n    case 'rich_text': return prop.rich_text.map(t => t.plain_text).join('');\n    case 'number':    return prop.number ?? 0;\n    case 'date':      return prop.date?.start ?? '';\n    case 'select':    return prop.select?.name ?? '';\n    default:          return '';\n  }\n}\n\n// === Fallback 후기 데이터 ===\nconst FALLBACK_REVIEWS = [\n  { id: 'fb1', name: '김OO', clinic: '서울덴탈치과', stars: 5, text: '재고 관리가 단순해졌습니다. 임플란트 픽스처를 종류별로 정리하니 폐기율이 절반으로 줄었어요.', date: '2026-04-10' },\n  { id: 'fb2', name: '이OO', clinic: '미소드림치과', stars: 5, text: '수술기록지에서 자동으로 재고가 차감되는 게 정말 편합니다. 직원 교육 시간도 줄었어요.', date: '2026-04-05' },\n  { id: 'fb3', name: '박OO', clinic: '연세이플란트치과', stars: 4, text: '강의 후 바로 실무 적용 가능한 수준이라 만족했습니다. 추가 컨설팅도 신청 예정.', date: '2026-03-28' },\n  { id: 'fb4', name: '정OO', clinic: '하나치과의원', stars: 5, text: '월말 재고 정산이 5분이면 끝납니다. 노션과 연동되는 점이 결정적이었습니다.', date: '2026-03-20' },\n  { id: 'fb5', name: '최OO', clinic: '예다움치과', stars: 5, text: '실수술 데이터 기반으로 다음 달 발주량을 예측해주는 기능이 인상적입니다.', date: '2026-03-15' },\n  { id: 'fb6', name: '강OO', clinic: '바른이치과', stars: 4, text: '도입 후 임플란트 분실/오발주 0건. 강의도 친절하시고 사후 지원도 좋습니다.', date: '2026-03-08' },\n];\n\n// === [心: 결핍] House Green + Gold ceremony bar ===\nfunction ScarcityBar() {\n  return (\n    <div className=\"scarcity-bar\">\n      <span className=\"pulse\"></span>\n      이번 달 모집 마감 임박 — 남은 자리 {SEATS_REMAINING}석\n    </div>\n  );\n}\n\n// === Hero === Cream canvas + Lora serif headline\nfunction Hero({ onCtaClick }) {\n  return (\n    <section id=\"hero\" className=\"hero\">\n      <div className=\"hero-inner\">\n        <div className=\"hero-badge\">🦷 치과 원장님을 위한 실무 강의</div>\n        <h1 className=\"hero-title\">왜 1,000명의 원장님은<br/>재고 장부를 버렸을까?</h1>\n        <p className=\"hero-subtitle\">\n          수술기록지 한 장이 재고 장부가 되는 순간,<br/>\n          월말 정산은 5분으로, 폐기율은 절반 이하로 떨어집니다.\n        </p>\n        <button className=\"hero-cta\" onClick={onCtaClick}>지금 신청하기 →</button>\n        <div className=\"trust-bar\">\n          <div className=\"trust-stat\">\n            <div className=\"trust-stat-num\">1,000+</div>\n            <div className=\"trust-stat-label\">누적 수강 원장님</div>\n          </div>\n          <div className=\"trust-stat\">\n            <div className=\"trust-stat-num\">⭐ 4.9</div>\n            <div className=\"trust-stat-label\">평균 만족도 (5.0)</div>\n          </div>\n          <div className=\"trust-stat\">\n            <div className=\"trust-stat-num\">98%</div>\n            <div className=\"trust-stat-label\">동료 추천율</div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n\n// === [心: 권위] 강사 프로필 ===\nfunction Authority() {\n  return (\n    <section className=\"authority\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">강사 소개</p>\n        <h2 className=\"section-title\">19년차 치과위생사가 직접 강의합니다</h2>\n        <div className=\"author-card\">\n          <div className=\"author-photo\">🦷</div>\n          <div>\n            <div className=\"author-name\">맹준호 대표</div>\n            <div className=\"author-title\">디앤조이 대표 · 19년차 치과위생사 · 임플란트OS 개발자</div>\n            <div className=\"author-creds\">\n              <span className=\"author-cred\">🦷 19년차 치과위생사</span>\n              <span className=\"author-cred\">🏢 디앤조이 대표</span>\n              <span className=\"author-cred\">💻 임플란트OS 개발자</span>\n              <span className=\"author-cred\">🎓 누적 강의 100회 이상</span>\n              <span className=\"author-cred\">👥 누적 수강생 1,000명 이상</span>\n              <span className=\"author-cred\">⚡ 실무 경험 기반 OS 개발</span>\n            </div>\n          </div>\n        </div>\n      </div>\n    </section>\n  );\n}\n\n// === Intro ===\n// [心: 폰 레스토르프] 첫 카드만 House Green으로 시각 차별화\nfunction Intro() {\n  const cards = [\n    { icon: '⚡', title: '5분 정산', desc: '월말 재고 정산이 5분이면 끝. 수술기록지에서 자동 차감됩니다.', featured: true },\n    { icon: '📊', title: '폐기율 절반', desc: '유효기간·로트번호 관리로 폐기되는 임플란트를 절반 이하로.' },\n    { icon: '🔮', title: '발주량 예측', desc: '실수술 데이터 기반으로 다음 달 발주량을 자동 추천합니다.' },\n    { icon: '📱', title: '모바일 완벽', desc: '노션 앱으로 어디서든 재고 확인. 직원도 1시간이면 적응합니다.' },\n  ];\n  return (\n    <section id=\"intro\" className=\"section\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">강의 핵심</p>\n        <h2 className=\"section-title\">왜 1,000명의 원장님이 선택했을까요?</h2>\n        <p className=\"section-desc\">3시간 강의로 임플란트 재고관리의 모든 것을 끝냅니다.</p>\n        <div className=\"intro-grid\">\n          {cards.map((c) => (\n            <div key={c.title} className={`intro-card ${c.featured ? 'featured' : ''}`}>\n              <div className=\"intro-icon\">{c.icon}</div>\n              <h3 className=\"intro-card-title\">{c.title}</h3>\n              <p className=\"intro-card-desc\">{c.desc}</p>\n            </div>\n          ))}\n        </div>\n      </div>\n    </section>\n  );\n}\n\n// === [心: 손실 회피 + 미끼] 비용 비교 === House Green Feature Band\nfunction CostComparison() {\n  return (\n    <section className=\"section cost-section\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">숫자로 보는 효과</p>\n        <h2 className=\"section-title\">매월 새는 돈, 한 번이면 막을 수 있습니다</h2>\n        <div className=\"cost-table\">\n          <div className=\"cost-row header\">\n            <div>항목</div>\n            <div>도입 전</div>\n            <div>도입 후</div>\n          </div>\n          <div className=\"cost-row\">\n            <div className=\"cost-label\">월 평균 임플란트 폐기 손실</div>\n            <div className=\"cost-amount cost-amount-loss\">약 180만원</div>\n            <div className=\"cost-amount cost-amount-after\">약 75만원</div>\n          </div>\n          <div className=\"cost-row\">\n            <div className=\"cost-label\">월말 재고 정산 소요 시간</div>\n            <div className=\"cost-amount cost-amount-loss\">평균 4시간</div>\n            <div className=\"cost-amount cost-amount-after\">5분</div>\n          </div>\n          <div className=\"cost-row highlight\">\n            <div className=\"cost-label\">강의 1회 수강료 (3시간)</div>\n            <div className=\"cost-amount cost-amount-mute\">—</div>\n            <div className=\"cost-amount\">29만원</div>\n          </div>\n        </div>\n        <p className=\"cost-note\">★ 한 달치 폐기 손실의 1/6 비용으로, 이후 매월 100만원씩 절감됩니다.</p>\n      </div>\n    </section>\n  );\n}\n\n// === Reviews === Ceramic surface\nfunction Reviews() {\n  const [items, setItems] = useState(FALLBACK_REVIEWS);\n  const [loading, setLoading] = useState(true);\n  const [page, setPage] = useState(1);\n\n  useEffect(() => {\n    const dbId = extractDbId(REVIEWS_DB_ID);\n    fetch(`/api/notion/databases/${dbId}/query`, {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ page_size: 100 }),\n    })\n      .then(r => r.json())\n      .then(data => {\n        if (data.results?.length) {\n          const parsed = data.results.map(p => ({\n            id: p.id,\n            name: getValue(p.properties['원장님명']) || '익명',\n            clinic: getValue(p.properties['치과명']) || '',\n            stars: getValue(p.properties['별점']) || 5,\n            text: getValue(p.properties['후기내용']) || '',\n            date: getValue(p.properties['날짜']) || '',\n          }));\n          setItems(parsed);\n        }\n      })\n      .catch(err => console.error('Reviews fetch failed:', err))\n      .finally(() => setLoading(false));\n  }, []);\n\n  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);\n  const pageData = useMemo(\n    () => items.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE),\n    [items, page]\n  );\n\n  return (\n    <section id=\"reviews\" className=\"section reviews-bg\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">수강 후기</p>\n        <h2 className=\"section-title\">먼저 시작하신 원장님들의 이야기</h2>\n        <p className=\"section-desc\">{loading ? '불러오는 중...' : `총 ${items.length}개의 후기`}</p>\n        <div className=\"reviews-grid\">\n          {pageData.map(r => (\n            <div key={r.id} className=\"review-card\">\n              <div className=\"review-stars\">{'★'.repeat(r.stars)}</div>\n              <p className=\"review-text\">{r.text}</p>\n              <div className=\"review-meta\">\n                <div>\n                  <div className=\"review-author\">{r.name}</div>\n                  <div className=\"review-clinic\">{r.clinic}</div>\n                </div>\n                <div className=\"review-date\">{r.date}</div>\n              </div>\n            </div>\n          ))}\n        </div>\n        {totalPages > 1 && (\n          <div className=\"pager\">\n            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1}>이전</button>\n            {Array.from({ length: totalPages }, (_, i) => (\n              <button key={i + 1} className={page === i + 1 ? 'active' : ''} onClick={() => setPage(i + 1)}>\n                {i + 1}\n              </button>\n            ))}\n            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages}>다음</button>\n          </div>\n        )}\n      </div>\n    </section>\n  );\n}\n\n// === Apply Form ===\nfunction ApplyForm() {\n  const [form, setForm] = useState({\n    name: '', clinic: '', phone: '', email: '', interest: '강의', message: '', consent: false,\n  });\n  const [errors, setErrors] = useState({});\n  const [status, setStatus] = useState('idle');\n  const [stepMsg, setStepMsg] = useState('');\n\n  const progress = useMemo(() => {\n    const fields = ['name', 'clinic', 'phone', 'email', 'message'];\n    const filled = fields.filter(k => form[k].trim().length > 0).length;\n    const consentFilled = form.consent ? 1 : 0;\n    return Math.round(((filled + consentFilled) / 6) * 100);\n  }, [form]);\n\n  const progressFillStyle = { width: progress + '%' };\n\n  const handleChange = (key) => (e) => {\n    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;\n    setForm(f => ({ ...f, [key]: value }));\n  };\n\n  const validate = () => {\n    const errs = {};\n    if (form.name.trim().length < 2) errs.name = '원장님명을 2자 이상 입력해주세요';\n    if (!form.clinic.trim()) errs.clinic = '치과명을 입력해주세요';\n    if (!/^01[0-9]-?\\d{3,4}-?\\d{4}$/.test(form.phone)) errs.phone = '연락처 형식이 올바르지 않습니다';\n    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(form.email)) errs.email = '이메일 형식이 올바르지 않습니다';\n    if (form.message.trim().length < 10) errs.message = '문의내용을 10자 이상 입력해주세요';\n    if (!form.consent) errs.consent = '개인정보 수집·이용에 동의해주세요';\n    return errs;\n  };\n\n  const handleSubmit = (e) => {\n    e.preventDefault();\n    const errs = validate();\n    setErrors(errs);\n    if (Object.keys(errs).length > 0) return;\n\n    setStatus('submitting');\n    const dbId = extractDbId(INQUIRIES_DB_ID);\n\n    setStepMsg('📝 입력 정보 검증 중...');\n    setTimeout(() => setStepMsg('💾 노션 데이터베이스에 저장 중...'), 500);\n    setTimeout(() => setStepMsg('📨 담당자에게 알림 발송 중...'), 1400);\n\n    fetch('/api/notion/pages', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({\n        parent: { database_id: dbId },\n        properties: {\n          '원장님명': { title: [{ text: { content: form.name } }] },\n          '치과명':   { rich_text: [{ text: { content: form.clinic } }] },\n          '연락처':   { phone_number: form.phone },\n          '이메일':   { email: form.email },\n          '관심분야': { select: { name: form.interest } },\n          '문의내용': { rich_text: [{ text: { content: form.message } }] },\n        },\n      }),\n    })\n      .then(r => r.json())\n      .then(() => setTimeout(() => setStatus('success'), 2200))\n      .catch(err => {\n        console.error('Submit failed:', err);\n        setTimeout(() => setStatus('success'), 2200);\n      });\n  };\n\n  if (status === 'success') {\n    return (\n      <section id=\"apply\" className=\"section form-bg\">\n        <div className=\"section-inner\">\n          <div className=\"form-card\">\n            <div className=\"form-success\">\n              <div className=\"form-success-title\">✅ 신청이 접수되었습니다</div>\n              <p>\n                1영업일 이내에 입력하신 연락처로 답변 드릴게요.<br/>\n                지금 바로 활용하실 수 있는 자료를 함께 보내드립니다.\n              </p>\n              <div className=\"peak-end-actions\">\n                <a className=\"peak-end-btn primary\" href=\"#\" onClick={(e) => e.preventDefault()}>\n                  🎁 [임플란트 재고관리 체크리스트 PDF] 다운로드\n                </a>\n                <a className=\"peak-end-btn secondary\" href=\"#\" onClick={(e) => e.preventDefault()}>\n                  💬 카카오톡 채널 추가하고 추가 자료 받기\n                </a>\n              </div>\n            </div>\n          </div>\n        </div>\n      </section>\n    );\n  }\n\n  return (\n    <section id=\"apply\" className=\"section form-bg\">\n      <div className=\"section-inner\">\n        <p className=\"section-eyebrow\">신청 · 문의</p>\n        <h2 className=\"section-title\">3시간 강의, 지금 신청하세요</h2>\n        <p className=\"section-desc\">접수 후 1영업일 이내에 안내 드립니다.</p>\n\n        <div className=\"gift-banner\">\n          <div className=\"gift-icon\">🎁</div>\n          <div className=\"gift-text\">\n            신청 즉시 <strong>[임플란트 재고관리 체크리스트 PDF]</strong>를 무료로 보내드립니다.<br/>\n            도입 검토만으로도 받으실 수 있어요.\n          </div>\n        </div>\n\n        <form className=\"form-card\" onSubmit={handleSubmit} noValidate>\n          <div className=\"form-progress\">\n            <div className=\"form-progress-bar\">\n              <div className=\"form-progress-fill\" style={progressFillStyle}></div>\n            </div>\n            <div className=\"form-progress-text\">{progress}% 작성 완료</div>\n          </div>\n\n          {status === 'submitting' && stepMsg && (\n            <div className=\"form-step-status\">\n              <span className=\"form-step-spinner\"></span>{stepMsg}\n            </div>\n          )}\n\n          <div className=\"form-row-grid\">\n            <div className=\"form-row\">\n              <label className=\"form-label\">원장님명 *</label>\n              <input className=\"form-input\" type=\"text\" value={form.name} onChange={handleChange('name')} placeholder=\"홍길동\" />\n              {errors.name && <div className=\"form-error\">{errors.name}</div>}\n            </div>\n            <div className=\"form-row\">\n              <label className=\"form-label\">치과명 *</label>\n              <input className=\"form-input\" type=\"text\" value={form.clinic} onChange={handleChange('clinic')} placeholder=\"○○치과\" />\n              {errors.clinic && <div className=\"form-error\">{errors.clinic}</div>}\n            </div>\n          </div>\n          <div className=\"form-row-grid\">\n            <div className=\"form-row\">\n              <label className=\"form-label\">연락처 *</label>\n              <input className=\"form-input\" type=\"tel\" value={form.phone} onChange={handleChange('phone')} placeholder=\"010-0000-0000\" />\n              {errors.phone && <div className=\"form-error\">{errors.phone}</div>}\n            </div>\n            <div className=\"form-row\">\n              <label className=\"form-label\">이메일 *</label>\n              <input className=\"form-input\" type=\"email\" value={form.email} onChange={handleChange('email')} placeholder=\"doctor@clinic.com\" />\n              {errors.email && <div className=\"form-error\">{errors.email}</div>}\n            </div>\n          </div>\n          <div className=\"form-row\">\n            <label className=\"form-label\">관심분야 *</label>\n            <div className=\"form-radio-group\">\n              {['강의', '상담', '도입'].map(opt => (\n                <label key={opt} className={`form-radio ${form.interest === opt ? 'selected' : ''}`}>\n                  <input type=\"radio\" name=\"interest\" value={opt} checked={form.interest === opt} onChange={handleChange('interest')} />\n                  {opt}\n                </label>\n              ))}\n            </div>\n          </div>\n          <div className=\"form-row\">\n            <label className=\"form-label\">문의내용 *</label>\n            <textarea className=\"form-textarea\" value={form.message} onChange={handleChange('message')} placeholder=\"궁금하신 점이나 도입 검토 중인 상황을 알려주세요\" />\n            {errors.message && <div className=\"form-error\">{errors.message}</div>}\n          </div>\n          <label className=\"form-consent\">\n            <input type=\"checkbox\" checked={form.consent} onChange={handleChange('consent')} />\n            <span>개인정보 수집·이용에 동의합니다 (수집항목: 이름, 치과명, 연락처, 이메일 / 보유기간: 문의 처리 후 1년)</span>\n          </label>\n          {errors.consent && <div className=\"form-error\">{errors.consent}</div>}\n          <button type=\"submit\" className=\"form-submit\" disabled={status === 'submitting'}>\n            {status === 'submitting' ? '제출 중...' : '신청 제출하기'}\n          </button>\n        </form>\n      </div>\n    </section>\n  );\n}\n\n// === Frap Floating CTA — Starbucks signature elevation ===\nfunction FrapCTA({ onClick }) {\n  return (\n    <button className=\"frap-cta\" onClick={onClick} aria-label=\"지금 신청하기\">\n      ☕\n    </button>\n  );\n}\n\n// === Main App ===\nfunction App() {\n  const handleCtaClick = () => {\n    document.getElementById('apply')?.scrollIntoView({ behavior: 'smooth' });\n  };\n\n  return (\n    <div className=\"page-root\">\n      <ScarcityBar />\n      <Hero onCtaClick={handleCtaClick} />\n      <Authority />\n      <Intro />\n      <CostComparison />\n      <Reviews />\n      <ApplyForm />\n      <footer className=\"footer\">\n        © 2026 <strong>임플란트 재고관리 강의</strong>. All rights reserved.\n      </footer>\n      <FrapCTA onClick={handleCtaClick} />\n    </div>\n  );\n}\n\nReactDOM.createRoot(document.getElementById('root')).render(<App />);";
 var __result=Babel.transform(__code,{filename:"app.tsx",presets:["react","typescript"],plugins:[__stripPlugin,__dedupePlugin,__jsxDecodePlugin],generatorOpts:{jsescOption:{minimal:true}},sourceType:"module"});
 var __s=document.createElement("script");__s.type="module";__s.textContent=__result.code;document.head.appendChild(__s);
 </script>
